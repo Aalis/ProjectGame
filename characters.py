@@ -1,6 +1,17 @@
+from fight_strategy import Mage, Druid, Rogue, Warrior, Archer
+
+
 class BaseCharacter:
     def __init__(
-        self, name, strength, agility, intelligence, experience, level, health=100
+        self,
+        name,
+        strength,
+        agility,
+        intelligence,
+        experience,
+        level,
+        health,
+        fight_strategy=None,
     ):
         self.name = name
         self.strength = strength
@@ -9,12 +20,13 @@ class BaseCharacter:
         self.experience = experience
         self.level = level
         self.health = health
+        self.fight_strategy = fight_strategy
 
     def attack(self, target):
-        pass
+        return self.fight_strategy.attack(target)
 
-    def defence(self, target):
-        pass
+    def defend(self):
+        return self.fight_strategy.defend()
 
     def display_stats(self):
         print(f"Name: {self.name}, Strength: {self.strength}, Health: {self.health}")
@@ -51,98 +63,77 @@ class Inventory:
 
 
 class TheElementalMage(BaseCharacter):
-    def __init__(
-        self, name, strength, agility, intelligence, experience, level, health
-    ):
+    def __init__(self, name):
         super().__init__(
-            name, strength, agility, intelligence, experience, level, health
+            name,
+            fight_strategy=Mage(),
+            strength=1,
+            agility=1,
+            intelligence=1,
+            experience=1,
+            level=1,
+            health=100,
         )
-
-    def attack(self, target):
-        # TODO:special attack
-        pass
-
-    def defence(self, target):
-        # TODO:special defence
-        pass
 
 
 class TheStealthyRogue(BaseCharacter):
-    def __init__(
-        self, name, strength, agility, intelligence, experience, level, health
-    ):
+    def __init__(self, name):
         super().__init__(
-            name, strength, agility, intelligence, experience, level, health
+            name,
+            fight_strategy=Rogue(),
+            strength=1,
+            agility=1,
+            intelligence=1,
+            experience=1,
+            level=1,
+            health=100,
         )
-
-    def attack(self, target):
-        # TODO:special attack
-        pass
-
-    def defence(self, target):
-        # TODO:special defence
-        pass
 
 
 class TheResillientWarrior(BaseCharacter):
-    def __init__(
-        self, name, strength, agility, intelligence, experience, level, health
-    ):
+    def __init__(self, name):
         super().__init__(
-            name, strength, agility, intelligence, experience, level, health
+            name,
+            fight_strategy=Warrior(),
+            strength=1,
+            agility=1,
+            intelligence=1,
+            experience=1,
+            level=1,
+            health=100,
         )
-
-    def attack(self, target):
-        # TODO:special attack
-        pass
-
-    def defence(self, target):
-        # TODO:special defence
-        pass
 
 
 class TheSkilledArcher(BaseCharacter):
-    def __init__(
-        self, name, strength, agility, intelligence, experience, level, health
-    ):
+    def __init__(self, name):
         super().__init__(
-            name, strength, agility, intelligence, experience, level, health
+            name,
+            fight_strategy=Archer(),
+            strength=1,
+            agility=1,
+            intelligence=1,
+            experience=1,
+            level=1,
+            health=100,
         )
-
-    def attack(self, target):
-        # TODO:special attack
-        pass
-
-    def defence(self, target):
-        # TODO:special defence
-        pass
 
 
 class TheMysticalDruid(BaseCharacter):
-    def __init__(
-        self, name, strength, agility, intelligence, experience, level, health
-    ):
+    def __init__(self, name):
         super().__init__(
-            name, strength, agility, intelligence, experience, level, health
+            name,
+            fight_strategy=Druid(),
+            strength=1,
+            agility=1,
+            intelligence=1,
+            experience=1,
+            level=1,
+            health=100,
         )
-
-    def attack(self, target):
-        # TODO:special attack
-        pass
-
-    def defence(self, target):
-        # TODO:special defence
-        pass
 
 
 if __name__ == "__main__":
-    p = TheMysticalDruid(
-        name="Dron",
-        strength=89,
-        agility=9,
-        experience=8,
-        level=0,
-        intelligence=98,
-        health=100,
-    )
+    p = TheMysticalDruid(name="jjj")
     p.display_stats()
+    p.attack("Monster")
+    p.defend()
