@@ -1,4 +1,5 @@
 from fight_strategy import Mage, Druid, Rogue, Warrior, Archer
+from magic_items import HealthPotion, HeavyAttack
 
 
 class BaseCharacter:
@@ -21,6 +22,7 @@ class BaseCharacter:
         self.level = level
         self.health = health
         self.fight_strategy = fight_strategy
+        self.inventory = Inventory()
 
     def attack(self, target):
         return self.fight_strategy.attack(target)
@@ -53,13 +55,22 @@ class Equipment:
 
 class Inventory:
     def __init__(self):
-        self.items = []
+        self.items = {}
 
     def add_item(self, item):
-        self.items.append(item)
+        self.items[item.name] = item
 
-    def remove_item(self, item):
-        self.items.remove(item)
+    def use_item(self, item_name, target):
+        if item_name in self.items:
+            self.items[item.name].use(target)
+        else:
+            print(f"{item_name} not in inventory")
+
+    def show_inventory(self):
+        item_str = ", ".join(
+            f"{item.name}: {item.amount} points" for item in self.items.values()
+        )
+        print(f"Inventory: {item_str}")
 
 
 class TheElementalMage(BaseCharacter):
@@ -133,7 +144,18 @@ class TheMysticalDruid(BaseCharacter):
 
 
 if __name__ == "__main__":
-    p = TheMysticalDruid(name="jjj")
+    # Create Character
+    p = TheMysticalDruid(name="Druid")
+
+    # Create Items
+    health_potion = HealthPotion(name="Health_Potion", amount=10)
+    heavy_attack = HeavyAttack(name="Heavy_Attack", amount=10)
+
+    # Add Items to character
+    p.inventory.add_item(health_potion)
+    p.inventory.add_item(heavy_attack)
+    p.inventory.show_inventory()
+
     p.display_stats()
     p.attack("Monster")
     p.defend()
