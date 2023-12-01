@@ -1,4 +1,4 @@
-from fight_strategy import Mage, Druid
+from fight_strategy import Mag, Druid
 
 
 class BaseCharacter:

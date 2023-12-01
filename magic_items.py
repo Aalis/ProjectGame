@@ -18,7 +18,7 @@ class HealthPotion(Item):
 
     def use(self, target):
         target.health += self.amount
-        print(f"{target.name} healed for {self.amount} health")
+        print(f"{target.name} healed: {self.amount} health")
 
 
 class HeavyAttack(Item):

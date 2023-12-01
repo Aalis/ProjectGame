@@ -1,5 +1,24 @@
 from fight_strategy import Mage, Druid, Rogue, Warrior, Archer
 from magic_items import HealthPotion, HeavyAttack
+from functools import wraps
+
+
+class World:
+    _instance = None
+
+    def __new__(cls):
+        if cls._instance is None:
+            cls._instance = super(World, cls).__new__(cls)
+            cls._instance.character = []
+        return cls._instance
+
+    def add_character(self, character):
+        self.character.append(character)
+
+    def show_characters(self):
+        print(f"Characters in the world:")
+        for character in self.character:
+            print(f"- {character.name}")
 
 
 class BaseCharacter:
@@ -62,7 +81,7 @@ class Inventory:
 
     def use_item(self, item_name, target):
         if item_name in self.items:
-            self.items[item.name].use(target)
+            self.items[item_name].use(target)
         else:
             print(f"{item_name} not in inventory")
 
@@ -145,17 +164,25 @@ class TheMysticalDruid(BaseCharacter):
 
 if __name__ == "__main__":
     # Create Character
-    p = TheMysticalDruid(name="Druid")
+    p1 = TheMysticalDruid(name="Druid")
+    p2 = TheStealthyRogue(name="Rogue")
+
+    world = World()
+    world.add_character(p1)
+    world.add_character(p2)
+    world.show_characters()
 
     # Create Items
     health_potion = HealthPotion(name="Health_Potion", amount=10)
     heavy_attack = HeavyAttack(name="Heavy_Attack", amount=10)
 
     # Add Items to character
-    p.inventory.add_item(health_potion)
-    p.inventory.add_item(heavy_attack)
-    p.inventory.show_inventory()
+    p1.inventory.add_item(health_potion)
+    p1.inventory.add_item(heavy_attack)
+    p1.inventory.show_inventory()
+    p1.inventory.use_item("Health_Potion", p1)
 
-    p.display_stats()
-    p.attack("Monster")
-    p.defend()
+    p1.display_stats()
+    p2.display_stats()
+    p1.attack(p2)
+    p1.defend()
