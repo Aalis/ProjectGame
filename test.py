@@ -1,49 +1,22 @@
-from fight_strategy import Mag, Druid
-
-
-class BaseCharacter:
-    def __init__(
-        self,
-        name,
-        strength,
-        agility,
-        intelligence,
-        experience,
-        level,
-        health,
-        fight_strategy=None,
-    ):
+class Character:
+    def __init__(self, name, health=100, strength=10):
         self.name = name
-        self.strength = strength
-        self.agility = agility
-        self.intelligence = intelligence
-        self.experience = experience
-        self.level = level
         self.health = health
-        self.fight_strategy = fight_strategy
+        self.strength = strength
 
-    def attack(self, target):
-        return self.fight_strategy.attack(target)
-
-    def defend(self):
-        return self.fight_strategy.defend()
+    def display_status(self):
+        print(f"{self.name}: Health={self.health}, Strength={self.strength}")
 
 
-class TheMysticalDruid(BaseCharacter):
-    def __init__(self, name):
-        super().__init__(
-            name,
-            fight_strategy=Druid(),
-            strength=1,
-            agility=1,
-            intelligence=1,
-            experience=1,
-            level=2,
-            health=100,
-        )
+def health_booster(character):
+    character.health += 10
+    print(f"{character.name} healed 10 health. Current health: {character.health}")
+    return character
 
 
-p = TheMysticalDruid("Ash")
-
-p.attack("Monster")
-p.defend()
+charact = Character("Test")
+charact.display_status()
+health_booster(charact)
+health_booster(charact)
+health_booster(charact)
+charact.display_status()

@@ -1,4 +1,3 @@
-from fight_strategy import Mage, Druid, Rogue, Warrior, Archer
 from magic_items import HealthPotion, HeavyAttack
 from functools import wraps
 
@@ -18,7 +17,9 @@ class World:
     def show_characters(self):
         print(f"Characters in the world:")
         for character in self.character:
-            print(f"- {character.name}")
+            print(
+                f"- {character.name}: Health={character.health}, Strength={character.strength}"
+            )
 
 
 class BaseCharacter:
@@ -31,7 +32,6 @@ class BaseCharacter:
         experience,
         level,
         health,
-        fight_strategy=None,
     ):
         self.name = name
         self.strength = strength
@@ -40,14 +40,13 @@ class BaseCharacter:
         self.experience = experience
         self.level = level
         self.health = health
-        self.fight_strategy = fight_strategy
         self.inventory = Inventory()
 
     def attack(self, target):
-        return self.fight_strategy.attack(target)
+        pass
 
     def defend(self):
-        return self.fight_strategy.defend()
+        pass
 
     def display_stats(self):
         print(f"Name: {self.name}, Strength: {self.strength}, Health: {self.health}")
@@ -73,30 +72,33 @@ class Equipment:
 
 
 class Inventory:
-    def __init__(self):
-        self.items = {}
+    def health_boost(character):
+        character.health += 10
+        print(f"{character.name} healed 10 health. Current health: {character.health}")
 
-    def add_item(self, item):
-        self.items[item.name] = item
+        return character
 
-    def use_item(self, item_name, target):
-        if item_name in self.items:
-            self.items[item_name].use(target)
-        else:
-            print(f"{item_name} not in inventory")
-
-    def show_inventory(self):
-        item_str = ", ".join(
-            f"{item.name}: {item.amount} points" for item in self.items.values()
+    def strength_boost(character):
+        character.strength += 2
+        print(
+            f"{character.name} gained 1 strength. Current strength: {character.strength}"
         )
-        print(f"Inventory: {item_str}")
+
+        return character
+
+    def agility_boost(character):
+        character.agility += 2
+        print(
+            f"{character.name} gained 1 agility. Current agility: {character.agility}"
+        )
+
+        return character
 
 
 class TheElementalMage(BaseCharacter):
     def __init__(self, name):
         super().__init__(
             name,
-            fight_strategy=Mage(),
             strength=1,
             agility=1,
             intelligence=1,
@@ -104,13 +106,19 @@ class TheElementalMage(BaseCharacter):
             level=1,
             health=100,
         )
+
+    def throw_fireball(self, target):
+        target.health -= 10
+        print(f"{target.name} took 10 damage. Current health: {target.health}")
+
+    def attack(self, target):
+        self.throw_fireball(target)
 
 
 class TheStealthyRogue(BaseCharacter):
     def __init__(self, name):
         super().__init__(
             name,
-            fight_strategy=Rogue(),
             strength=1,
             agility=1,
             intelligence=1,
@@ -118,13 +126,19 @@ class TheStealthyRogue(BaseCharacter):
             level=1,
             health=100,
         )
+
+    def backstab(self, target):
+        target.health -= 10
+        print(f"{target.name} took 10 damage. Current health: {target.health}")
+
+    def attack(self, target):
+        self.backstab(target)
 
 
 class TheResillientWarrior(BaseCharacter):
     def __init__(self, name):
         super().__init__(
             name,
-            fight_strategy=Warrior(),
             strength=1,
             agility=1,
             intelligence=1,
@@ -132,13 +146,19 @@ class TheResillientWarrior(BaseCharacter):
             level=1,
             health=100,
         )
+
+    def axe_strike(self, target):
+        target.health -= 7
+        print(f"{target.name} took 10 damage. Current health: {target.health}")
+
+    def attack(self, target):
+        self.axe_strike(target)
 
 
 class TheSkilledArcher(BaseCharacter):
     def __init__(self, name):
         super().__init__(
             name,
-            fight_strategy=Archer(),
             strength=1,
             agility=1,
             intelligence=1,
@@ -146,13 +166,19 @@ class TheSkilledArcher(BaseCharacter):
             level=1,
             health=100,
         )
+
+    def bow_shoot(self, target):
+        target.health -= 5
+        print(f"{target.name} took 10 damage. Current health: {target.health}")
+
+    def attack(self, target):
+        self.bow_shoot(target)
 
 
 class TheMysticalDruid(BaseCharacter):
     def __init__(self, name):
         super().__init__(
             name,
-            fight_strategy=Druid(),
             strength=1,
             agility=1,
             intelligence=1,
@@ -160,6 +186,13 @@ class TheMysticalDruid(BaseCharacter):
             level=1,
             health=100,
         )
+
+    def cast_spell(self, target):
+        target.health -= 5
+        print(f"{target.name} took 10 damage. Current health: {target.health}")
+
+    def attack(self, target):
+        self.cast_spell(target)
 
 
 if __name__ == "__main__":
@@ -172,17 +205,11 @@ if __name__ == "__main__":
     world.add_character(p2)
     world.show_characters()
 
-    # Create Items
-    health_potion = HealthPotion(name="Health_Potion", amount=10)
-    heavy_attack = HeavyAttack(name="Heavy_Attack", amount=10)
+    # Apply boost items on character
+    Inventory.health_boost(p1)
+    Inventory.strength_boost(p1)
 
-    # Add Items to character
-    p1.inventory.add_item(health_potion)
-    p1.inventory.add_item(heavy_attack)
-    p1.inventory.show_inventory()
-    p1.inventory.use_item("Health_Potion", p1)
+    p2.backstab(p1)
 
     p1.display_stats()
     p2.display_stats()
-    p1.attack(p2)
-    p1.defend()
