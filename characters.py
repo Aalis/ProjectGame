@@ -1,7 +1,3 @@
-from magic_items import HealthPotion, HeavyAttack
-from functools import wraps
-
-
 class World:
     _instance = None
 
@@ -22,6 +18,26 @@ class World:
             )
 
 
+class Weapon:
+    def __init__(self, name, damage):
+        self.name = name
+        self.damage = damage
+
+
+class Potion:
+    def __init__(self, name, effect):
+        self.name = name
+        self.effect = effect
+
+
+class HealthPotion(Potion):
+    def __init__(self, name):
+        super().__init__(name, effect="health")
+
+    def apply(self, character):
+        character.use_potion(self)
+
+
 class BaseCharacter:
     def __init__(
         self,
@@ -31,6 +47,7 @@ class BaseCharacter:
         intelligence,
         experience,
         level,
+        weapon,
         health,
     ):
         self.name = name
@@ -39,6 +56,7 @@ class BaseCharacter:
         self.intelligence = intelligence
         self.experience = experience
         self.level = level
+        self.weapon = None
         self.health = health
         self.inventory = Inventory()
 
@@ -48,8 +66,45 @@ class BaseCharacter:
     def defend(self):
         pass
 
+    def gain_experience(self, experience):
+        self.experience += experience
+        print(
+            f"{self.name} gained {experience} experience. Current experience: {self.experience}"
+        )
+        while self.experience >= self.level * 100:
+            self.level_up()
+
+    def level_up(self):
+        self.level += 1
+        print(f"{self.name} has leveled up to level {self.level}")
+        self.strength += 2
+        self.agility += 1
+        self.health += 10
+        self.intelligence += 1
+
+    def equip_weapon(self, weapon):
+        self.weapon = weapon
+        print(f"{self.name} equipped {weapon.name}")
+
+    def use_potion(self, potion):
+        if potion in self.inventory.potions:
+            if potion.effect == "health":
+                self.health *= 1.2
+                print(f"{self.name} healed 10 health. Current health: {self.health}")
+            elif potion.effect == "strength":
+                self.strength += 2
+                print(
+                    f"{self.name} gained 1 strength. Current strength: {self.strength}"
+                )
+            # Remove the used potion from the inventory
+            self.inventory.potions.remove(potion)
+        else:
+            print(f"{self.name} does not have {potion.name} in their inventory.")
+
     def display_stats(self):
-        print(f"Name: {self.name}, Strength: {self.strength}, Health: {self.health}")
+        print(
+            f"Name: {self.name}, Strength: {self.strength}, Health: {self.health}, Level: {self.level}, Experience: {self.experience}"
+        )
 
 
 class Equipment:
@@ -72,27 +127,24 @@ class Equipment:
 
 
 class Inventory:
-    def health_boost(character):
-        character.health += 10
-        print(f"{character.name} healed 10 health. Current health: {character.health}")
+    def __init__(self):
+        self.weapons = []
+        self.potions = []
 
-        return character
+    def add_weapon(self, weapon):
+        self.weapons.append(weapon)
 
-    def strength_boost(character):
-        character.strength += 2
-        print(
-            f"{character.name} gained 1 strength. Current strength: {character.strength}"
-        )
+    def add_potion(self, potion):
+        self.potions.append(potion)
 
-        return character
+    def show_inventory(self):
+        print("Weapons:")
+        for weapon in self.weapons:
+            print(f"- {weapon.name}")
 
-    def agility_boost(character):
-        character.agility += 2
-        print(
-            f"{character.name} gained 1 agility. Current agility: {character.agility}"
-        )
-
-        return character
+        print("Potions:")
+        for potion in self.potions:
+            print(f"- {potion.name}")
 
 
 class TheElementalMage(BaseCharacter):
@@ -104,15 +156,20 @@ class TheElementalMage(BaseCharacter):
             intelligence=1,
             experience=1,
             level=1,
+            weapon=None,
             health=100,
         )
 
-    def throw_fireball(self, target):
-        target.health -= 10
-        print(f"{target.name} took 10 damage. Current health: {target.health}")
-
     def attack(self, target):
-        self.throw_fireball(target)
+        if self.weapon is not None:
+            damage = self.weapon.damage * self.strength
+            target.health -= damage
+            print(f"{self.name} attacked with {self.weapon.name}!")
+            print(f"{target.name}'s health: {target.health}")
+        else:  # unarmed attack
+            target.health -= self.strength
+            print(f"{self.name} attacked with an unarmed strike!")
+            print(f"{target.name}'s health: {target.health}")
 
 
 class TheStealthyRogue(BaseCharacter):
@@ -124,15 +181,20 @@ class TheStealthyRogue(BaseCharacter):
             intelligence=1,
             experience=1,
             level=1,
+            weapon=None,
             health=100,
         )
 
-    def backstab(self, target):
-        target.health -= 10
-        print(f"{target.name} took 10 damage. Current health: {target.health}")
-
     def attack(self, target):
-        self.backstab(target)
+        if self.weapon is not None:
+            damage = self.weapon.damage * self.strength
+            target.health -= damage
+            print(f"{self.name} attacked with {self.weapon.name}!")
+            print(f"{target.name}'s health: {target.health}")
+        else:  # unarmed attack
+            target.health -= self.strength
+            print(f"{self.name} attacked with an unarmed strike!")
+            print(f"{target.name}'s health: {target.health}")
 
 
 class TheResillientWarrior(BaseCharacter):
@@ -144,15 +206,20 @@ class TheResillientWarrior(BaseCharacter):
             intelligence=1,
             experience=1,
             level=1,
+            weapon=None,
             health=100,
         )
 
-    def axe_strike(self, target):
-        target.health -= 7
-        print(f"{target.name} took 10 damage. Current health: {target.health}")
-
     def attack(self, target):
-        self.axe_strike(target)
+        if self.weapon is not None:
+            damage = self.weapon.damage * self.strength
+            target.health -= damage
+            print(f"{self.name} attacked with {self.weapon.name}!")
+            print(f"{target.name}'s health: {target.health}")
+        else:  # unarmed attack
+            target.health -= self.strength
+            print(f"{self.name} attacked with an unarmed strike!")
+            print(f"{target.name}'s health: {target.health}")
 
 
 class TheSkilledArcher(BaseCharacter):
@@ -164,15 +231,20 @@ class TheSkilledArcher(BaseCharacter):
             intelligence=1,
             experience=1,
             level=1,
+            weapon=None,
             health=100,
         )
 
-    def bow_shoot(self, target):
-        target.health -= 5
-        print(f"{target.name} took 10 damage. Current health: {target.health}")
-
     def attack(self, target):
-        self.bow_shoot(target)
+        if self.weapon is not None:
+            damage = self.weapon.damage * self.strength
+            target.health -= damage
+            print(f"{self.name} attacked with {self.weapon.name}!")
+            print(f"{target.name}'s health: {target.health}")
+        else:  # unarmed attack
+            target.health -= self.strength
+            print(f"{self.name} attacked with an unarmed strike!")
+            print(f"{target.name}'s health: {target.health}")
 
 
 class TheMysticalDruid(BaseCharacter):
@@ -184,32 +256,17 @@ class TheMysticalDruid(BaseCharacter):
             intelligence=1,
             experience=1,
             level=1,
+            weapon=None,
             health=100,
         )
 
-    def cast_spell(self, target):
-        target.health -= 5
-        print(f"{target.name} took 10 damage. Current health: {target.health}")
-
     def attack(self, target):
-        self.cast_spell(target)
-
-
-if __name__ == "__main__":
-    # Create Character
-    p1 = TheMysticalDruid(name="Druid")
-    p2 = TheStealthyRogue(name="Rogue")
-
-    world = World()
-    world.add_character(p1)
-    world.add_character(p2)
-    world.show_characters()
-
-    # Apply boost items on character
-    Inventory.health_boost(p1)
-    Inventory.strength_boost(p1)
-
-    p2.backstab(p1)
-
-    p1.display_stats()
-    p2.display_stats()
+        if self.weapon is not None:
+            damage = self.weapon.damage * self.strength
+            target.health -= damage
+            print(f"{self.name} attacked with {self.weapon.name}!")
+            print(f"{target.name}'s health: {target.health}")
+        else:  # unarmed attack
+            target.health -= self.strength
+            print(f"{self.name} attacked with an unarmed strike!")
+            print(f"{target.name}'s health: {target.health}")
